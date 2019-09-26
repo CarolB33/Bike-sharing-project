@@ -44,7 +44,7 @@ def get_filters():
                 input_day = input("Guess again: ")
 
     print('-'*40)
-    return city, month, day
+    return input_city, input_month, input_day
 
 
 def load_data(city, month, day):
