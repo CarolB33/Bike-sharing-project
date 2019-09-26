@@ -7,8 +7,9 @@ CITY_DATA = { 'chicago': 'chicago.csv',
               'washington': 'washington.csv' }
 
 def get_filters():
-    global month
-    global day
+    global input_month
+    global input_day
+
     month = ['january','febuary', 'march','april','may','june','july','august','september','october','november','december','all']
     day = ['all','monday','tuesday','wednesday','thursday','friday','saturday','sunday']
     """
@@ -21,27 +22,29 @@ def get_filters():
     """
     print('Hello! Let\'s explore some US bikeshare data!')
     # get user input for city (chicago, new york city, washington). HINT: Use a while loop to handle invalid inputs
-    city = ['chicago','new york city', 'washington','all']
+    city = ['chicago','new york city', 'washington']
     while True:
-        input_city = input("Which city would you like to select: chicago, new York city, washington or all? ").lower()
+        input_city = input("Which city would you like to select: chicago, new York city, washington?").lower()
         if input_city not in city:
-            print("Guess again")
+            print("You may have misspell the city, please try again!", end='')
             continue
         else:
             break
         
-        while True:
-            input_month = input("Please select a month or all: ").lower()
-            if input_month not in month:
-                print ("You may have misspell the month, please try again!", end='')
-                continue
-            else:
-                break
-            
-            input_day = input("Please select a day of the week or all - please use full name: ").lower()
-            while input_day not in day:
-                print("You may have misspell the day, please try again!", end='')
-                input_day = input("Guess again: ")
+    while True:
+        input_month = input("Please select a month or all: ").lower()
+        if input_month not in month:
+            print ("You may have misspell the month, please try again!", end='')
+            continue
+        else:
+            break
+    while True:
+        input_day = input("Please select a day of the week or all - please use full name: ").lower()
+        if input_day not in day:
+            print("You may have misspell the day, please try again!", end='')
+            continue
+        else:
+            break
 
     print('-'*40)
     return input_city, input_month, input_day
@@ -67,7 +70,8 @@ def load_data(city, month, day):
 
     # extract month and day of week from Start Time to create new columns
     df['month'] = df['Start Time'].dt.month
-    df['day_of_week'] = df['Start Time'].dt.weekday_name
+    df['day_of_week'] = df['Start Time'].dt.weekday
+    df["hour"] = df["Start Time"].dt.hour
 
     # filter by month if applicable
     if month != 'all':
@@ -81,7 +85,7 @@ def load_data(city, month, day):
     # filter by day of week if applicable
     if day != 'all':
         # filter by day of week to create the new dataframe
-        df = df[df['day_of_week'] == day.title()]
+        df = df[df['day_of_week'] == day]
 
     return df
 
@@ -91,13 +95,11 @@ def time_stats(df):
     print('\nCalculating The Most Frequent Times of Travel...\n')
     start_time = time.time()
     # display the most common month
-    popular_month = df.month.mode()[0]
-
+    popular_month = df["month"].mode()[0]
     # display the most common day of week
-    popular_day = df.day.mode()[0]
-
+    popular_day = df['day_of_week'].mode()[0]
     # display the most common start hour
-    popular_hour = df.hour.mode()[0]
+    popular_hour = df['hour'].mode()[0]
     
     print("\nThis took %s seconds." % (time.time() - start_time))
     print('-'*40)
@@ -110,13 +112,15 @@ def station_stats(df):
     start_time = time.time()
 
     # display most commonly used start station
-
+    # for the below I got help from http://www.datasciencemadesimple.com/mode-function-python-pandas-dataframe-row-column-wise-mode/
+    popular_start_station = df.loc[:,"Start Station"].mode()[0]
 
     # display most commonly used end station
-
+    popular_end_station = df.loc[:,"End Station"].mode()[0]
 
     # display most frequent combination of start station and end station trip
-
+    # help from https://www.reddit.com/r/learnpython/comments/7s99rk/pandas_sort_by_most_frequent_value_combinations/
+    start_end_station = df.groupby(['Start Station', 'End Station']).size()
 
     print("\nThis took %s seconds." % (time.time() - start_time))
     print('-'*40)
