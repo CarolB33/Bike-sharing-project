@@ -9,7 +9,7 @@ CITY_DATA = { 'chicago': 'chicago.csv',
 def get_filters():
     global input_month
     global input_day
-
+    
     month = ['january','february', 'march','april','may','june','all']
     day = ['all','monday','tuesday','wednesday','thursday','friday','saturday','sunday']
     """
@@ -24,7 +24,7 @@ def get_filters():
     # get user input for city (chicago, new york city, washington). HINT: Use a while loop to handle invalid inputs
     city = ['chicago','new york city', 'washington']
     while True:
-        input_city = input("Which city would you like to select: chicago, new York city, washington?").lower()
+        input_city = input("Which city would you like to select: chicago, new york city, washington?").lower()
         if input_city not in city:
             print("You may have misspell the city, please try again!", end='')
             continue
@@ -64,14 +64,14 @@ def load_data(city, month, day):
 
     # load data file into a dataframe
     df = pd.read_csv(CITY_DATA[city])
-
-    # convert the Start Time column to datetime
+	#the below code was helped with the practice exercises for the bike sharing assignment
+    #convert start and end time into datetime
     df['Start Time'] = pd.to_datetime(df['Start Time'])
-
+    df['End Time'] = pd.to_datetime(df['End Time'])
     # extract month and day of week from Start Time to create new columns
     df['month'] = df['Start Time'].dt.month
     df['day_of_week'] = df['Start Time'].dt.weekday_name
-    df["hour"] = df["Start Time"].dt.hour
+    df["Start hour"] = df["Start Time"].dt.hour
 
     # filter by month if applicable
     if month != 'all':
@@ -90,18 +90,19 @@ def load_data(city, month, day):
     return df
 
 def time_stats(df):
-    """Displays statistics on the most frequent times of travel."""
 
+    """Displays statistics on the most frequent times of travel."""
+    #the below code was helped with the practice exercises for the bike sharing assignment
     print('\nCalculating The Most Frequent Times of Travel...\n')
     start_time = time.time()
     # display the most common month
     popular_month = df['month'].mode()[0]
-    print('Most Popular month:', popular_hour)
+    print('Most Popular month:', popular_month)
     # display the most common day of week
     popular_day = df['day_of_week'].mode()[0]
     print('The most common day of the week is:',popular_day)
     # display the most common start hour
-    popular_hour = df['hour'].mode()[0]
+    popular_hour = df['Start hour'].mode()[0]
     print('The most common start hour is:'.format(popular_hour))
     print("\nThis took %s seconds." % (time.time() - start_time))
     print('-'*40)
@@ -112,18 +113,18 @@ def station_stats(df):
 
     print('\nCalculating The Most Popular Stations and Trip...\n')
     start_time = time.time()
-
+      
     # display most commonly used start station
     # for the below I got help from http://www.datasciencemadesimple.com/mode-function-python-pandas-dataframe-row-column-wise-mode/
     popular_start_station = df.loc[:,"Start Station"].mode()[0]
-
+    print('Most Popular start station is:', popular_start_station)
     # display most commonly used end station
     popular_end_station = df.loc[:,"End Station"].mode()[0]
-
+    print('Most Popular end station is:', popular_end_station)
     # display most frequent combination of start station and end station trip
-    # help from https://www.reddit.com/r/learnpython/comments/7s99rk/pandas_sort_by_most_frequent_value_combinations/
-    start_end_station = df.groupby(['Start Station', 'End Station']).size()
-
+    # I got help from https://www.reddit.com/r/learnpython/comments/7s99rk/pandas_sort_by_most_frequent_value_combinations/
+    start_end_station = df.groupby(['Start Station', 'End Station']).size().idxmax()
+    print('Most frequent combination of start and end station trip:', start_end_station)
     print("\nThis took %s seconds." % (time.time() - start_time))
     print('-'*40)
 
@@ -133,13 +134,13 @@ def trip_duration_stats(df):
 
     print('\nCalculating Trip Duration...\n')
     start_time = time.time()
-
+    df["Trip Duration"] = df["End Time"] - df["Start Time"]
     # display total travel time
     total_duration = df.groupby(['Trip Duration']).sum()
-
+    print('total travel time for your trip:', total_duration)
     # display mean travel time
     mean_duration = df.groupby(['Trip Duration']).mean()
-
+    print('Average travel time for your trip:', mean_duration)
     print("\nThis took %s seconds." % (time.time() - start_time))
     print('-'*40)
 
@@ -154,15 +155,11 @@ def user_stats(df):
     user_types = df['User Type'].value_counts()
     print(user_types)
 
-    # Display counts of gender
-   # advise taken from https://knowledge.udacity.com/questions/55524
-    
-
-#Like this
+    #the following knowledge board messaged helped me with the below: https://knowledge.udacity.com/questions/55524
 
     if "Gender" in df.columns:
         user_gender = df['Gender'].value_counts()
-        print(user_gender)
+        print('Gender count:', user_gender)
     else:
         print("Gender column does not exists")
 
@@ -170,27 +167,40 @@ def user_stats(df):
     # Display earliest, most recent, and most common year of birth
     if 'Birth Year' in df.columns:
         min_user_dob= df['Birth Year'].min()
-        print(min_user_dob)
+        print('Earliest date of birth:', min_user_dob)
     else:
         
         print("Date of birth column does not exist")
     
     if 'Birth Year' in df.columns:
         max_user_dob = df['Birth Year'].max()
-        print(max_user_dob)
+        print('Latest birth year is:', max_user_dob)
     
     else:
         print("Date of birth column does not exist")
     
     if 'Birth Year' in df.columns:
         dob_count = df['Birth Year'].mode()[0]
-        print(dob_count)
+        print('most common year of birth', dob_count)
     else:
         print("Date of birth column does not exist")
 
     print("\nThis took %s seconds." % (time.time() - start_time))
     print('-'*40)
 
+#got help from the following knowledge board answer: https://knowledge.udacity.com/questions/26261 &
+# website: https://www.dataquest.io/blog/pandas-python-tutorial/
+    user_input = input('\nWould you like to see the first 5 rows of the file?\nPlease enter yes or no\n').lower()
+    if user_input in ('yes'):
+        i = 0
+        while True:
+            df = df.iloc[0:5,:]
+            df.head()
+            print(df.iloc[i:i+5])
+            i += 5
+            more_data = input('Would you like to see more data? Please enter yes or no: ').lower()
+            if more_data not in ('yes'):
+                break
 
 def main():
     while True:
@@ -202,6 +212,10 @@ def main():
         trip_duration_stats(df)
         user_stats(df)
 
+    
+    
+        
+        
         restart = input('\nWould you like to restart? Enter yes or no.\n')
         if restart.lower() != 'yes':
             break
