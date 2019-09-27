@@ -64,7 +64,7 @@ def load_data(city, month, day):
 
     # load data file into a dataframe
     df = pd.read_csv(CITY_DATA[city])
-	#the below code was helped with the practice exercises for the bike sharing assignment
+
     #convert start and end time into datetime
     df['Start Time'] = pd.to_datetime(df['Start Time'])
     df['End Time'] = pd.to_datetime(df['End Time'])
@@ -136,10 +136,10 @@ def trip_duration_stats(df):
     start_time = time.time()
     df["Trip Duration"] = df["End Time"] - df["Start Time"]
     # display total travel time
-    total_duration = df.groupby(['Trip Duration']).sum()
+    total_duration = df['Trip Duration'].sum()
     print('total travel time for your trip:', total_duration)
     # display mean travel time
-    mean_duration = df.groupby(['Trip Duration']).mean()
+    mean_duration = df['Trip Duration'].mean()
     print('Average travel time for your trip:', mean_duration)
     print("\nThis took %s seconds." % (time.time() - start_time))
     print('-'*40)
@@ -191,11 +191,9 @@ def user_stats(df):
 #got help from the following knowledge board answer: https://knowledge.udacity.com/questions/26261 &
 # website: https://www.dataquest.io/blog/pandas-python-tutorial/
     input_data = input('\nWould you like to see the first 5 rows of the file? Please enter yes or no:').lower()
-    if imput_data in ('yes'):
+    if input_data in ('yes'):
         i = 0
         while True:
-            df = df.iloc[0:5,:]
-            df.head()
             print(df.iloc[i:i+5])
             i += 5
             add_data = input('Would you like to see more data? Please enter yes or no: ').lower()
@@ -212,9 +210,7 @@ def main():
         trip_duration_stats(df)
         user_stats(df)
 
-    
-    
-        
+
         
         restart = input('\nWould you like to restart? Enter yes or no.\n')
         if restart.lower() != 'yes':
