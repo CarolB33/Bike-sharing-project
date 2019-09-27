@@ -190,16 +190,16 @@ def user_stats(df):
 
 #got help from the following knowledge board answer: https://knowledge.udacity.com/questions/26261 &
 # website: https://www.dataquest.io/blog/pandas-python-tutorial/
-    user_input = input('\nWould you like to see the first 5 rows of the file?\nPlease enter yes or no\n').lower()
-    if user_input in ('yes'):
+    input_data = input('\nWould you like to see the first 5 rows of the file? Please enter yes or no:').lower()
+    if imput_data in ('yes'):
         i = 0
         while True:
             df = df.iloc[0:5,:]
             df.head()
             print(df.iloc[i:i+5])
             i += 5
-            more_data = input('Would you like to see more data? Please enter yes or no: ').lower()
-            if more_data not in ('yes'):
+            add_data = input('Would you like to see more data? Please enter yes or no: ').lower()
+            if add_data not in ('yes'):
                 break
 
 def main():
