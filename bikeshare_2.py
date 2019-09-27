@@ -10,7 +10,7 @@ def get_filters():
     global input_month
     global input_day
 
-    month = ['january','febuary', 'march','april','may','june','july','august','september','october','november','december','all']
+    month = ['january','february', 'march','april','may','june','all']
     day = ['all','monday','tuesday','wednesday','thursday','friday','saturday','sunday']
     """
     Asks user to specify a city, month, and day to analyze.
@@ -45,7 +45,7 @@ def get_filters():
             continue
         else:
             break
-
+        
     print('-'*40)
     return input_city, input_month, input_day
 
@@ -70,7 +70,7 @@ def load_data(city, month, day):
 
     # extract month and day of week from Start Time to create new columns
     df['month'] = df['Start Time'].dt.month
-    df['day_of_week'] = df['Start Time'].dt.weekday
+    df['day_of_week'] = df['Start Time'].dt.weekday_name
     df["hour"] = df["Start Time"].dt.hour
 
     # filter by month if applicable
@@ -85,8 +85,8 @@ def load_data(city, month, day):
     # filter by day of week if applicable
     if day != 'all':
         # filter by day of week to create the new dataframe
-        df = df[df['day_of_week'] == day]
-
+        df = df[df['day_of_week'] == day.title()]
+        print('You have selected the following filters: \nCity: {}\nMonth: {}\nDay: {}'.format(city, month, day))
     return df
 
 def time_stats(df):
@@ -95,12 +95,14 @@ def time_stats(df):
     print('\nCalculating The Most Frequent Times of Travel...\n')
     start_time = time.time()
     # display the most common month
-    popular_month = df["month"].mode()[0]
+    popular_month = df['month'].mode()[0]
+    print('Most Popular month:', popular_hour)
     # display the most common day of week
     popular_day = df['day_of_week'].mode()[0]
+    print('The most common day of the week is:',popular_day)
     # display the most common start hour
     popular_hour = df['hour'].mode()[0]
-    
+    print('The most common start hour is:'.format(popular_hour))
     print("\nThis took %s seconds." % (time.time() - start_time))
     print('-'*40)
 
@@ -133,10 +135,10 @@ def trip_duration_stats(df):
     start_time = time.time()
 
     # display total travel time
-
+    total_duration = df.groupby(['Trip Duration']).sum()
 
     # display mean travel time
-
+    mean_duration = df.groupby(['Trip Duration']).mean()
 
     print("\nThis took %s seconds." % (time.time() - start_time))
     print('-'*40)
@@ -149,13 +151,42 @@ def user_stats(df):
     start_time = time.time()
 
     # Display counts of user types
-
+    user_types = df['User Type'].value_counts()
+    print(user_types)
 
     # Display counts of gender
+   # advise taken from https://knowledge.udacity.com/questions/55524
+    
+
+#Like this
+
+    if "Gender" in df.columns:
+        user_gender = df['Gender'].value_counts()
+        print(user_gender)
+    else:
+        print("Gender column does not exists")
 
 
     # Display earliest, most recent, and most common year of birth
-
+    if 'Birth Year' in df.columns:
+        min_user_dob= df['Birth Year'].min()
+        print(min_user_dob)
+    else:
+        
+        print("Date of birth column does not exist")
+    
+    if 'Birth Year' in df.columns:
+        max_user_dob = df['Birth Year'].max()
+        print(max_user_dob)
+    
+    else:
+        print("Date of birth column does not exist")
+    
+    if 'Birth Year' in df.columns:
+        dob_count = df['Birth Year'].mode()[0]
+        print(dob_count)
+    else:
+        print("Date of birth column does not exist")
 
     print("\nThis took %s seconds." % (time.time() - start_time))
     print('-'*40)
